@@ -3,9 +3,3 @@ Multilayer Perceptrons
 
 Convolution Neural Networks
 - convolutional layer -->  you have created a convolutional neural network!
-
-Recurrent Neural Networks
-
-Deep Belief Networks
-
-Restricted Boltzmann Machine
