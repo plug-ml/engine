@@ -1,7 +1,6 @@
 import button
 
 import tkinter
-from typing import Collection
 
 BACKGROUND='white'
 
