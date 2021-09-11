@@ -39,19 +39,33 @@ def train_network(params_dict, train_X, train_Y):
     # # model.add(Dense(16, input_dim=20, activation=’relu’))
     # model.add(Dense(12, activation=’relu’))
     # model.add(Dense(4, activation=’softmax’))
-    input_dim = len(train_X)
+
+    num_inputs = params_dict["num_inputs"]
+    layer_sizes = params_dict["layer_sizes"]
 
     model = Sequential()
-    model.add(Dense(100)) #, input_shape=(input_dim,))) # params_dict[0]
-    model.add(LeakyReLU(alpha=0.03)) # params_dict['0_relu']
-    model.add(Dense(100))
+    model.add(Dense(num_inputs)) #, input_shape=(input_dim,))) # params_dict["num_inputs"]
     model.add(LeakyReLU(alpha=0.03))
+
+    for size in layer_sizes:
+        model.add(Dense(100))
+        model.add(LeakyReLU(alpha=0.03))
+    
     model.add(Dense(1))
 
     model.compile(loss='mse', optimizer=Adam(lr=0.01), metrics=['mse'])
-    model.fit(train_X, train_Y, epochs=300)
+
+    if("epochs" in params_dict):
+        model.fit(train_X, train_Y, epochs=params_dict["epochs"])
+    else:
+        model.fit(train_X, train_Y, epochs=300)
 
     return model
+
+# For users that dont want to specify network specific params
+def mlp_network(params_dict, train_X, train_Y):
+    num_inputs = params_dict["num_inputs"]
+    return train_network({"num_inputs" : num_inputs, "layer_sizes": [10, 10, 6], "epochs": 100}, train_X, train_Y)
 
 
 # train_X = [1, 2, 3]
@@ -74,7 +88,8 @@ train_Y = sine_train_data[:, 1]
 # print('train_X_fuckers', train_X[:5])
 # print('train_Y_fuckers', train_Y[:5])
 
-model = train_network({}, train_X, train_Y)
+# model = train_network({"num_inputs": 1, "layer_sizes": [100], "epochs": 200}, train_X, train_Y)
+model = mlp_network({"num_inputs": 1}, train_X, train_Y)
 # model = train_network({}, train_X, train_Y)
 
 
