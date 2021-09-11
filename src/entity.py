@@ -16,8 +16,8 @@ class Entity:
     self.is_static = is_static
     self.draw_func = draw_func
 
-  def draw(self, canvas, **args):
-    self.draw_func(canvas, *self.get_params(), **args)
+  def draw(self, canvas):
+    self.draw_func(canvas, *self.get_params())
 
   def get_params(self):
     x, y, width, height = self.x, self.y, self.width, self.height

@@ -11,7 +11,10 @@ fbutton_list = []
 button_list = []
 
 
-lyr = button.NodeLayer(50, 50, 200, 200, lambda: print('hi'), [])
+
+
+lyr = button.NodeLayer(50, 50, 50, 20, lambda: print('hi'))
+lyr.nodes = 10
 button_list.append(lyr)
 
 def MousePos(event):
@@ -23,14 +26,13 @@ def MousePress(event):
     if btn.inButton(event.x, event.y):
       btn.onClick()
 
-
 def KeyPressed(event):
   pass
 
 def redrawAll(canvas, root):
   canvas.delete("all")
   for button in button_list:
-    button.drawButton(canvas)
+    button.draw(canvas)
   root.after(2000, lambda: redrawAll(canvas, root))
 
     
