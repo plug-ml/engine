@@ -1,7 +1,7 @@
 
 Offset_x, Offset_y = 0, 0
 
-def draw_box(canvas, x, y, width, height, color='black')
+def draw_box(canvas, x, y, width, height, color='black'):
   canvas.create_line(x, y, x + width, y, fill=color)
   canvas.create_line(x, y, x, y + height, fill=color)
   canvas.create_line(x + width, y, x + width, y + height, fill=color)
@@ -16,8 +16,8 @@ class Entity:
     self.is_static = is_static
     self.draw_func = draw_func
 
-  def draw(self, canvas):
-    self.draw_func(canvas, self.x, self.y, self.width, self.height)
+  def draw(self, canvas, **args):
+    self.draw_func(canvas, *self.get_params(), **args)
 
   def get_params(self):
     x, y, width, height = self.x, self.y, self.width, self.height
