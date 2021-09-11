@@ -1,0 +1,63 @@
+import tensorflow as tf
+from tensorflow import keras
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LeakyReLU
+##
+import pandas as pd 
+import pdb
+import numpy as np
+import random
+import math
+import argparse
+import tensorflow as tf 
+import matplotlib.pyplot as plt
+from keras import losses
+from keras import models
+from keras import regularizers
+from keras.layers.core import Dense
+from keras.layers.core import Dropout
+from keras.layers.core import Flatten
+from keras.layers.recurrent import LSTM
+from keras.layers.recurrent import GRU
+from keras.layers.convolutional import Conv1D
+from keras.callbacks import TensorBoard
+from tensorflow.keras.optimizers import Adam
+from keras.layers.advanced_activations import LeakyReLU
+from shutil import copyfile
+##
+
+# Neural network
+def train_network(params_dict, train_X, train_Y):
+    '''
+    inputs: parameters dictionary contianing layer values, mapping by indicies
+    outputs:
+    '''
+    # model = Sequential()
+    # model.add(Dense(1, input_dim=input_dim))
+    # # model.add(Dense(16, input_dim=20, activation=’relu’))
+    # model.add(Dense(12, activation=’relu’))
+    # model.add(Dense(4, activation=’softmax’))
+    input_dim = len(train_X)
+
+    model = Sequential()
+    model.add(Dense(100)) #, input_shape=(input_dim,)))
+    model.add(LeakyReLU(alpha=0.03))
+    model.add(Dense(100))
+    model.add(LeakyReLU(alpha=0.03))
+    model.add(Dense(1))
+
+    model.compile(loss='mse', optimizer=Adam(lr=0.0001))
+    model.fit(train_X, train_Y, 30)
+
+    return model
+
+
+# train_X = [1, 2, 3]
+# train_Y = [4, 5, 6]
+model = train_network({}, train_X, train_Y)
+
+def test_network(test_X, model): 
+    return model.predict(test_X)
+
+print(test_network(train_X, model))
