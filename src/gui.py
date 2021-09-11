@@ -5,17 +5,15 @@ import tkinter
 
 BACKGROUND='white'
 
-# stuff to work on: order in which things are drawn, how we should draw listnode by listnode and all 
-# child objects in each listnode from top to bottom. Each listnode also has a list of addbuttons as well.
-
 root, canvas = None, None
 
 Mouse_x, Mouse_y = 0, 0
 
 nn = [1]
+prior_button_list = []
 button_list = []
 
-lyr = button.NodeLayer(50, 50, 50, 20, lambda: print('hi'))
+lyr = button.NodeLayer(50, 50, 50, 20, lambda: print("hi"), 0)
 lyr.nodes = 10
 button_list.append(lyr)
 
@@ -35,6 +33,8 @@ def handleMouseDrag(event):
   redrawAll(canvas, root)
 
 def handleMousePress(event):
+  for btn in prior_button_list:
+    pass
   for btn in button_list:
     if btn.inButton(event.x, event.y):
       btn.onClick()
@@ -46,7 +46,9 @@ def redrawAll(canvas, root):
   canvas.delete("all")
   for button in button_list:
     button.draw(canvas)
-    
+  for button in prior_button_list:
+    button.draw(canvas)
+        
 def main(width=800, height=600):
   global root, canvas
   root = tkinter.Tk()

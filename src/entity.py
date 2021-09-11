@@ -25,3 +25,7 @@ class Entity:
       x += Offset_x
       y += Offset_y
     return x, y, width, height
+
+  def changePos(self, delta_x, delta_y):
+    self.x += delta_x
+    self.y += delta_y
