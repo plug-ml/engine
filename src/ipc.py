@@ -2,6 +2,7 @@ import socket
 
 LOCALHOST = 'localhost'
 
+Socket = None
 Connection = None
 
 def send(data):
@@ -24,9 +25,12 @@ def get_mapped_list(func):
   data = get_list()
   return list(map(func, data))
 
-def start(port):
+def new(port):
+  global Socket
+  Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  Socket.bind((LOCALHOST, port))
+
+def start():
   global Connection
-  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  sock.bind((LOCALHOST, port))
-  sock.listen(0)
-  Connection, _ = sock.accept() 
+  Socket.listen(0)
+  Connection, _ = Socket.accept() 
