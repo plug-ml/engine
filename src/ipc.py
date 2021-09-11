@@ -5,9 +5,9 @@ LOCALHOST = 'localhost'
 Connection = None
 
 def send(data):
-  Connection.sendall(data.encode())
+  Connection.sendall(('%s\n' % data).encode())
 
-def send_list(*data):
+def send_list(data):
   send(','.join(list(map(str, data))))
 
 def get():
@@ -25,6 +25,7 @@ def get_mapped_list(func):
   return list(map(func, data))
 
 def start(port):
+  global Connection
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   sock.bind((LOCALHOST, port))
   sock.listen(0)
