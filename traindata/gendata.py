@@ -5,7 +5,7 @@ import math
 with open('sine_test_data.csv', 'w', newline='') as sinetestdata:
     datawriter = csv.writer(sinetestdata, delimiter=' ')
     for i in range(1000):
-        n = 2*random.random() - 1
+        n = 8*random.random() - 4
         datawriter.writerow([str(n)] + [str(math.sin(n))])
 
 
@@ -18,7 +18,7 @@ with open('lin_test_data.csv', 'w', newline='') as lindata:
 with open('sine_train_data.csv', 'w', newline='') as sinetestdata:
     datawriter = csv.writer(sinetestdata, delimiter=' ')
     for i in range(1000):
-        n = 2*random.random() - 1
+        n = 8*random.random() - 4
         datawriter.writerow([str(n)] + [str(math.sin(n))])
 
 
