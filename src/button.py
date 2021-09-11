@@ -33,12 +33,13 @@ class NodeLayer(Button):
         button.inButton(x, y)
     
       self.isClicked = True
-      leftAddButt = AddButton(self.x_0, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("+"))
-      rightaddButt = AddButton(self.x_0 + self.w*2/3, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("+"))
-      minusButton = AddButton(self.x_0 + self.w/3, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("-"))
-      self.pmButtons += [leftAddButt, rightaddButt, minusButton]
+      if self.pmButtons == []:
+        leftAddButt = AddButton(self.x_0, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("+"))
+        rightaddButt = AddButton(self.x_0 + self.w*2/3, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("+"))
+        minusButton = AddButton(self.x_0 + self.w/3, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("-"))
+        self.pmButtons += [leftAddButt, rightaddButt, minusButton]
       return True
-    if self.isClicked and  False:
+    if self.isClicked and False:
       pass
     self.isClicked = False
     self.pmButtons = []
