@@ -16,11 +16,14 @@ from keras import losses
 from keras import models
 from keras import regularizers
 from keras.layers.core import Dense
+# from keras.layers.core import Conv2D
 from keras.layers.core import Dropout
 from keras.layers.core import Flatten
 from keras.layers.recurrent import LSTM
 from keras.layers.recurrent import GRU
 from keras.layers.convolutional import Conv1D
+from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import MaxPooling2D
 from keras.callbacks import TensorBoard
 from tensorflow.keras.optimizers import Adam
 from keras.layers.advanced_activations import LeakyReLU
@@ -62,10 +65,31 @@ def train_network(params_dict, train_X, train_Y):
 
     return model
 
-# For users that dont want to specify network specific params
+# MLP Network - For users that dont want to specify network specific params 
 def mlp_network(params_dict, train_X, train_Y):
     num_inputs = params_dict["num_inputs"]
     return train_network({"num_inputs" : num_inputs, "layer_sizes": [10, 10, 6], "epochs": 100}, train_X, train_Y)
+
+# CNN Network - For users that dont want to specify network specific params 
+def cnn_network(params_dict, train_X, train_Y):
+    num_inputs = params_dict["num_inputs"]
+    model = models.Sequential()
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)))
+    model.add(MaxPooling2D((2, 2)))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D((2, 2)))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Flatten())
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(1))
+
+    if("epochs" in params_dict):
+        model.fit(train_X, train_Y, epochs=params_dict["epochs"])
+    else:
+        model.fit(train_X, train_Y, epochs=300)
+
+    return model
+    # return train_network({"num_inputs" : num_inputs, "layer_sizes": [10, 10, 6], "epochs": 100}, train_X, train_Y)
 
 
 # train_X = [1, 2, 3]
