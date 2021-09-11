@@ -1,5 +1,7 @@
 import entity
 
+START_Y = 375
+
 class Button(entity.Entity):
   def __init__(self, x, y, width, height, onClicked, draw_func=entity.draw_box, is_static=False):
     super().__init__(x, y, width, height, draw_func=draw_func, is_static=is_static)
@@ -17,7 +19,7 @@ class NodeLayer(Button):
     self.dim = dim
     self.gap = gap
     self.nodes = 1 
- 
+
   def drawLayer(self, canvas, x, y, width, height):
     dim = self.dim
     gap = self.gap

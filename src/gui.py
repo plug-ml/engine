@@ -12,7 +12,7 @@ root, canvas = None, None
 
 Mouse_x, Mouse_y = 0, 0
 
-fbutton_list = []
+nn = [1]
 button_list = []
 
 lyr = button.NodeLayer(50, 50, 50, 20, lambda: print('hi'))
