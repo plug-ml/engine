@@ -25,6 +25,7 @@ from keras.callbacks import TensorBoard
 from tensorflow.keras.optimizers import Adam
 from keras.layers.advanced_activations import LeakyReLU
 from shutil import copyfile
+import pandas as pd
 ##
 
 # Neural network
@@ -41,23 +42,41 @@ def train_network(params_dict, train_X, train_Y):
     input_dim = len(train_X)
 
     model = Sequential()
-    model.add(Dense(100)) #, input_shape=(input_dim,)))
-    model.add(LeakyReLU(alpha=0.03))
+    model.add(Dense(100)) #, input_shape=(input_dim,))) # params_dict[0]
+    model.add(LeakyReLU(alpha=0.03)) # params_dict['0_relu']
     model.add(Dense(100))
     model.add(LeakyReLU(alpha=0.03))
     model.add(Dense(1))
 
-    model.compile(loss='mse', optimizer=Adam(lr=0.0001))
-    model.fit(train_X, train_Y, 30)
+    model.compile(loss='mse', optimizer=Adam(lr=0.01), metrics=['mse'])
+    model.fit(train_X, train_Y, epochs=300)
 
     return model
 
 
 # train_X = [1, 2, 3]
 # train_Y = [4, 5, 6]
-model = train_network({}, train_X, train_Y)
 
 def test_network(test_X, model): 
     return model.predict(test_X)
 
-print(test_network(train_X, model))
+# lindata = pd.read_csv('../traindata/lindata.csv')
+# lindata = np.genfromtxt('../traindata/lindata.csv')
+sine_train_data = np.genfromtxt('../traindata/sine_train_data.csv')
+sine_test_data = np.genfromtxt('../traindata/sine_test_data.csv')
+
+# train_X = lindata[:, 0]
+# train_Y = lindata[:, 1]
+
+train_X = sine_train_data[:, 0]
+train_Y = sine_train_data[:, 1]
+
+# print('train_X_fuckers', train_X[:5])
+# print('train_Y_fuckers', train_Y[:5])
+
+model = train_network({}, train_X, train_Y)
+# model = train_network({}, train_X, train_Y)
+
+
+test_Y = test_network(train_X, model)
+print(test_Y)
