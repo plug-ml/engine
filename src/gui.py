@@ -11,8 +11,8 @@ fbutton_list = []
 button_list = []
 
 
-btn = button.Button(50, 50, 200, 200, lambda: print('hi'))
-button_list.append(btn)
+lyr = button.NodeLayer(50, 50, 200, 200, lambda: print('hi'), [])
+button_list.append(lyr)
 
 def MousePos(event):
   x, y = event.x, event.y
@@ -23,10 +23,17 @@ def MousePress(event):
     if btn.inButton(event.x, event.y):
       btn.onClick()
 
+
 def KeyPressed(event):
   pass
-# Need to add clicking an addbutton adds a listnode to the right or left of its parent listnode
 
+def redrawAll(canvas, root):
+  canvas.delete("all")
+  for button in button_list:
+    button.drawButton(canvas)
+  root.after(2000, lambda: redrawAll(canvas, root))
+
+    
 def main(width=800, height=600):
   root = tkinter.Tk()
   try:
@@ -37,12 +44,13 @@ def main(width=800, height=600):
   canvas = tkinter.Canvas(root, bg=BACKGROUND, height=height, width=width)
   canvas.pack()
 
-  for button in button_list:
-    button.drawButton(canvas)
-  
+
+
   root.bind('<Motion>', MousePos)
   root.bind('<Button-1>', MousePress)
   root.bind('<Key>', KeyPressed)
+  root.after(2000, lambda: redrawAll(canvas, root))
   root.mainloop()
 
+  
 main()
