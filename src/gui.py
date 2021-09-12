@@ -5,17 +5,13 @@ import tkinter
 
 BACKGROUND='white'
 
-root, canvas = None, None
+root, canvas, prior_button_list, button_list  = None, None, None, None
 
 Mouse_x, Mouse_y = 0, 0
 
 nn = [1]
-prior_button_list = []
-button_list = []
 
-lyr = button.NodeLayer(50, 50, 50, 20, lambda: print("hi"), 0)
-lyr.nodes = 10
-button_list.append(lyr)
+
 
 def updateMousePos(event):
   global Mouse_x, Mouse_y
@@ -33,11 +29,11 @@ def handleMouseDrag(event):
   redrawAll(canvas, root)
 
 def handleMousePress(event):
-  for btn in prior_button_list:
-    pass
+  global root, canvas
   for btn in button_list:
     if btn.inButton(event.x, event.y):
       btn.onClick()
+  redrawAll(canvas, root)
 
 def KeyPressed(event):
   pass
@@ -46,11 +42,18 @@ def redrawAll(canvas, root):
   canvas.delete("all")
   for button in button_list:
     button.draw(canvas)
-  for button in prior_button_list:
-    button.draw(canvas)
+
         
 def main(width=800, height=600):
-  global root, canvas
+  global root, canvas, prior_button_list, button_list 
+  
+  prior_button_list = []
+  button_list = []
+
+  lyr = button.NodeLayer(50, 50, 50, 20, lambda: print("hi"), 0)
+  lyr.nodes = 10
+  button_list.append(lyr)
+
   root = tkinter.Tk()
   try:
     root.attributes('-type', 'dialog')
