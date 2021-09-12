@@ -74,24 +74,23 @@ def mlp_network(params_dict, train_X, train_Y):
 def test_network(test_X, model): 
     return model.predict(test_X)
 
-# lindata = pd.read_csv('../traindata/lindata.csv')
-# lindata = np.genfromtxt('../traindata/lindata.csv')
-sine_train_data = np.genfromtxt('../traindata/sine_train_data.csv')
-sine_test_data = np.genfromtxt('../traindata/sine_test_data.csv')
+# test sine
+def test():
+    # lindata = pd.read_csv('../traindata/lindata.csv')
+    # lindata = np.genfromtxt('../traindata/lindata.csv')
+    sine_train_data = np.genfromtxt('../traindata/sine_train_data.csv')
+    sine_test_data = np.genfromtxt('../traindata/sine_test_data.csv')
 
-# train_X = lindata[:, 0]
-# train_Y = lindata[:, 1]
+    # train_X = lindata[:, 0]
+    # train_Y = lindata[:, 1]
 
-train_X = sine_train_data[:, 0]
-train_Y = sine_train_data[:, 1]
+    train_X = sine_train_data[:, 0]
+    train_Y = sine_train_data[:, 1]
 
-# print('train_X_fuckers', train_X[:5])
-# print('train_Y_fuckers', train_Y[:5])
-
-# model = train_network({"num_inputs": 1, "layer_sizes": [100], "epochs": 200}, train_X, train_Y)
-model = mlp_network({"num_inputs": 1}, train_X, train_Y)
-# model = train_network({}, train_X, train_Y)
+    # model = train_network({"num_inputs": 1, "layer_sizes": [100], "epochs": 200}, train_X, train_Y)
+    model = mlp_network({"num_inputs": 1}, train_X, train_Y)
+    # model = train_network({}, train_X, train_Y)
 
 
-test_Y = test_network(train_X, model)
-print(test_Y)
+    test_Y = test_network(train_X, model)
+    print(test_Y)

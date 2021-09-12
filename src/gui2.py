@@ -4,6 +4,7 @@ import button
 import entity
 import ipc
 from network import *
+import main
 
 BACKGROUND='white'
 
@@ -11,6 +12,8 @@ BACKGROUND='white'
 Mouse_x, Mouse_y = 0, 0
 
 network = None
+model = None
+
 def draw_run_button(canvas, x, y, width, height):
   color = 'green'
   offset = 10
@@ -20,12 +23,33 @@ def draw_run_button(canvas, x, y, width, height):
   canvas.create_line(x + width - offset, y + height / 2, x + offset, y + offset)
 
 def run():
+  params_dict = {"num_inputs": network.layer_list[0].num_nodes, "layer_sizes": list(map(lambda x: x.num_nodes, network.layer_list[1:]))}
   ipc.start()
-  ipc.get_mapped_list(float)
+  data = ipc.get_mapped_list(float)
+  data = main.test_network(data, model)
+  print(type(data), data)
+  ipc.send_list(data)
   # run nn into data
   # ipc.send_list(data)
 
+def draw_train_button(canvas, x, y, width, height):
+  color = 'purple'
+  offset = 10
+  canvas.create_oval(x, y, x + width, y + width, outline=color)
+  canvas.create_line(x + offset, y + offset, x + width - offset, y + offset)
+  canvas.create_line(x + width / 2, y + offset, x + width / 2, y + height - offset)
+
+def train():
+  global model
+  input_size = network.layer_list[0].num_nodes
+  params_dict = {"num_inputs": input_size, "layer_sizes": list(map(lambda x: x.num_nodes, network.layer_list[1:]))}
+  ipc.start()
+  inputs = ipc.get_mapped_list(float)
+  outputs = ipc.get_mapped_list(float)
+  model = main.train_network(params_dict, inputs, outputs)
+
 run_button = button.Button(10, 10, 50, 50, run, draw_run_button, is_static=True)
+train_button = button.Button(70, 10, 50, 50, train, draw_train_button, is_static=True)
 
 def updateMousePos(event):
   global Mouse_x, Mouse_y
@@ -68,6 +92,7 @@ def redraw(canvas):
   canvas.delete('all')
   network.drawNetwork(canvas)
   run_button.draw(canvas)
+  train_button.draw(canvas)
 
 def main(width=800, height=600):
   global root, canvas, network
