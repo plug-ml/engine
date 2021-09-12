@@ -1,72 +1,63 @@
+import entity
 
-class Button:
-  def __init__(self, x_0, y_0, width, length, onClicked):
-    self.x_0 = x_0
-    self.y_0 = y_0
-    self.w = width
-    self.l = length
-    self.onClicked = onClicked 
+START_Y = 375
 
-  def drawButton(self, canvas, color="black"):
-    canvas.create_line(self.x_0, self.y_0, self.x_0 + self.w, self.y_0, fill=color)
-    canvas.create_line(self.x_0, self.y_0, self.x_0, self.y_0 + self.l, fill=color)
-    canvas.create_line(self.x_0 + self.w, self.y_0, self.x_0 + self.w, self.y_0 + self.l, fill=color)
-    canvas.create_line(self.x_0, self.y_0 + self.l, self.x_0 + self.w, self.y_0 + self.l, fill=color)
+class Button(entity.Entity):
+  def __init__(self, x, y, width, height, onClicked, draw_func=entity.draw_box, is_static=False):
+    super().__init__(x, y, width, height, draw_func=draw_func, is_static=is_static)
+    self.onClicked = onClicked
 
   def inButton(self, x, y):
-    return self.x_0 <= x and x <= self.x_0 + self.w and self.y_0 <= y and y <= self.y_0 + self.l
+    return self.x <= x and x <= self.x + self.width and self.y <= y and y <= self.y + self.height
 
   def onClick(self):
     self.onClicked()
+  
 
 class NodeLayer(Button):
-  def __init__(self, x_0, y_0, width, length, func, buttons):
-    super().__init__(x_0, y_0, width, length, func)
-    self.isClicked = False
-    self.buttonList = buttons
-    self.pmButtons = []
+  def __init__(self, x, dim, gap, onClicked, index):
+    super().__init__(x, START_Y - dim / 2, dim, dim, onClicked, draw_func=self.drawLayer, is_static=False)
+    self.dim = dim
+    self.gap = gap
+    self.nodes = 1 
+    self.index = index
+    self.spawnNodeButtons = lambda: AddButton(), MinusButton()
+    #self.spawnLayerButtons = lambda: AddButton(x, START_Y, dim, gap, newLayer(x, START_Y, dim, gap, onClicked, 50, , index)), MinusButton(), AddButton()
 
+  def drawLayer(self, canvas, x, y, width, height):
+    dim = self.dim
+    gap = self.gap
+    nodes = self.nodes
+    for i in range(nodes):
+      canvas.create_oval(x, y + (dim + gap) * i, x + dim, y + (dim + gap) * i + dim, fill='white')
+    self.leftAdd.draw(canvas)
+    self.minusBtn.draw(canvas)
+    self.rightAdd.draw(canvas)
 
-  def inButton(self, x, y):
-    if self.x_0 <= x and x <= self.x_0 + self.w and self.y_0 <= y and y <= self.y_0 + self.l:
-      for button in self.pmButtons:
-        button.inButton(x, y)
-    
-      self.isClicked = True
-      if self.pmButtons == []:
-        leftAddButt = AddButton(self.x_0, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("+"))
-        rightaddButt = AddButton(self.x_0 + self.w*2/3, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("+"))
-        minusButton = AddButton(self.x_0 + self.w/3, self.y_0, self.w/3, self.y_0 + self.l/8, lambda: print("-"))
-        self.pmButtons += [leftAddButt, rightaddButt, minusButton]
-      return True
-    if self.isClicked and False:
-      pass
-    self.isClicked = False
-    self.pmButtons = []
-    return False
-
-  def drawButton(self, canvas):
-    if self.isClicked:
-      super().drawButton(canvas, color="red")
-      for button in self.pmButtons:
-        button.drawButton(canvas)
-
-
+  def onClick(self, x, y):
+    if self.inButton(x, y):
+      self.spawnLayerButtons()
 
 class AddButton(Button):
-  def __init__(self, x_0, y_0, width, length, func):
-    super().__init__(x_0, y_0, width, length, func)
-    self.isClicked = False
+  def __init__(self, x, y, dim, gap, onClicked, index):
+    super().__init__(x, y, dim, dim, onClicked, draw_func=self.drawLayer, is_static=False)
+    self.index = index
   
-  def inButton(self, x, y):
-    if self.x_0 <= x and x <= self.x_0 + self.w and self.y_0 <= y and y <= self.y_0 + self.l:
-      self.isClicked = True
-      self.onClicked()
-      return True
-    self.isClicked = False
-    return False
+  def onClick(self):
+    self.onClicked()
 
-  def drawButton(self, canvas):
-    super().drawButton(canvas)
-    canvas.create_line((self.x_0 + self.w)/2, self.y_0 + self.l/8, (self.x_0 + self.w)/2, self.y_0 + self.l/8*7)
-    canvas.create_line(self.x_0 + self.w/8 , (self.y_0 + self.l)/2, self.x_0 + self.w/8*7, (self.y_0 + self.l)/2)
+class MinusButton(Button):
+  def __init__(self, x, y, dim, gap, onClicked, index):
+    super().__init__(x, y, dim, dim, onClicked, draw_func=self.drawLayer, is_static=False)
+    self.index = index
+  
+def newLayer(x, y, dim, gap, onClicked, x_displace, layer_list, index):
+  for i in range(index, len(layer_list)):
+    layer_list[i].changePos(x_displace, 0)
+  layer_list.insert(i, NodeLayer(x, y, dim, gap, onClicked))
+
+
+def removeLayer(x_displace, layer_list, index):
+  for i in range(index, len(layer_list)):
+    layer_list[i].changePos(-x_displace, 0)
+  layer_list.pop(index)
