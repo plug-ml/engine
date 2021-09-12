@@ -9,8 +9,6 @@ root, canvas, prior_button_list, button_list  = None, None, None, None
 
 Mouse_x, Mouse_y = 0, 0
 
-nn = [1]
-
 
 
 def updateMousePos(event):

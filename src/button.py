@@ -22,7 +22,7 @@ class NodeLayer(Button):
     self.nodes = 1 
     self.index = index
     self.spawnNodeButtons = lambda: AddButton(), MinusButton()
-    self.spawnLayerButtons = lambda: AddButton(x, START_Y, dim, gap, newLayer(x, START_Y, dim, gap, onClicked, 50, , index)), MinusButton(), AddButton()
+    #self.spawnLayerButtons = lambda: AddButton(x, START_Y, dim, gap, newLayer(x, START_Y, dim, gap, onClicked, 50, , index)), MinusButton(), AddButton()
 
   def drawLayer(self, canvas, x, y, width, height):
     dim = self.dim
@@ -34,8 +34,8 @@ class NodeLayer(Button):
     self.minusBtn.draw(canvas)
     self.rightAdd.draw(canvas)
 
-  def inButton(self, x, y):
-    if self.x <= x and x <= self.x + self.width and self.y <= y and y <= self.y + self.height:
+  def onClick(self, x, y):
+    if self.inButton(x, y):
       self.spawnLayerButtons()
 
 class AddButton(Button):
