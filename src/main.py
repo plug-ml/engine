@@ -1,96 +1,122 @@
-import tensorflow as tf
-from tensorflow import keras
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LeakyReLU
-##
-import pandas as pd 
-import pdb
-import numpy as np
-import random
-import math
-import argparse
-import tensorflow as tf 
-import matplotlib.pyplot as plt
-from keras import losses
-from keras import models
-from keras import regularizers
-from keras.layers.core import Dense
-from keras.layers.core import Dropout
-from keras.layers.core import Flatten
-from keras.layers.recurrent import LSTM
-from keras.layers.recurrent import GRU
-from keras.layers.convolutional import Conv1D
-from keras.callbacks import TensorBoard
-from tensorflow.keras.optimizers import Adam
-from keras.layers.advanced_activations import LeakyReLU
-from shutil import copyfile
-import pandas as pd
-##
+import tkinter
 
-# Neural network
-def train_network(params_dict, train_X, train_Y):
-    '''
-    inputs: parameters dictionary contianing layer values, mapping by indicies
-    outputs:
-    '''
-    # model = Sequential()
-    # model.add(Dense(1, input_dim=input_dim))
-    # # model.add(Dense(16, input_dim=20, activation=’relu’))
-    # model.add(Dense(12, activation=’relu’))
-    # model.add(Dense(4, activation=’softmax’))
+import button
+import entity
+import ipc
+from network import *
+import nn
 
-    num_inputs = params_dict["num_inputs"]
-    layer_sizes = params_dict["layer_sizes"]
-
-    model = Sequential()
-    model.add(Dense(num_inputs)) #, input_shape=(input_dim,))) # params_dict["num_inputs"]
-    model.add(LeakyReLU(alpha=0.03))
-
-    for size in layer_sizes:
-        model.add(Dense(size))
-        model.add(LeakyReLU(alpha=0.03))
-    
-    model.add(Dense(1))
-
-    model.compile(loss='mse', optimizer=Adam(lr=0.01), metrics=['mse'])
-
-    if("epochs" in params_dict):
-        model.fit(train_X, train_Y, epochs=params_dict["epochs"])
-    else:
-        model.fit(train_X, train_Y, epochs=300)
-
-    return model
-
-# For users that dont want to specify network specific params
-def mlp_network(params_dict, train_X, train_Y):
-    num_inputs = params_dict["num_inputs"]
-    return train_network({"num_inputs" : num_inputs, "layer_sizes": [10, 10, 6], "epochs": 100}, train_X, train_Y)
+BACKGROUND='white'
 
 
-# train_X = [1, 2, 3]
-# train_Y = [4, 5, 6]
+Mouse_x, Mouse_y = 0, 0
 
-def test_network(test_X, model): 
-    return model.predict(test_X)
+network = None
+model = None
 
-# test sine
-def test():
-    # lindata = pd.read_csv('../traindata/lindata.csv')
-    # lindata = np.genfromtxt('../traindata/lindata.csv')
-    sine_train_data = np.genfromtxt('../traindata/sine_train_data.csv')
-    sine_test_data = np.genfromtxt('../traindata/sine_test_data.csv')
+def draw_run_button(canvas, x, y, width, height):
+  color = 'green'
+  offset = 10
+  canvas.create_oval(x, y, x + width, y + width, outline=color)
+  canvas.create_line(x + offset, y + offset, x + offset, y + height - offset)
+  canvas.create_line(x + width - offset, y + height / 2, x + offset, y + height - offset)
+  canvas.create_line(x + width - offset, y + height / 2, x + offset, y + offset)
 
-    # train_X = lindata[:, 0]
-    # train_Y = lindata[:, 1]
+def run():
+  params_dict = {"num_inputs": network.layer_list[0].num_nodes, "layer_sizes": list(map(lambda x: x.num_nodes, network.layer_list[1:]))}
+  ipc.start()
+  data = ipc.get_mapped_list(float)
+  data = list(nn.test_network(data, model).flatten())
+  ipc.send_list(data)
+  # run nn into data
+  # ipc.send_list(data)
 
-    train_X = sine_train_data[:, 0]
-    train_Y = sine_train_data[:, 1]
+def draw_train_button(canvas, x, y, width, height):
+  color = 'purple'
+  offset = 10
+  canvas.create_oval(x, y, x + width, y + width, outline=color)
+  canvas.create_line(x + offset, y + offset, x + width - offset, y + offset)
+  canvas.create_line(x + width / 2, y + offset, x + width / 2, y + height - offset)
 
-    # model = train_network({"num_inputs": 1, "layer_sizes": [100], "epochs": 200}, train_X, train_Y)
-    model = mlp_network({"num_inputs": 1}, train_X, train_Y)
-    # model = train_network({}, train_X, train_Y)
+def train():
+  global model
+  input_size = network.layer_list[0].num_nodes
+  params_dict = {"num_inputs": input_size, "layer_sizes": list(map(lambda x: x.num_nodes, network.layer_list[1:]))}
+  ipc.start()
+  inputs = ipc.get_mapped_list(float)
+  outputs = ipc.get_mapped_list(float)
+  model = nn.train_network(params_dict, inputs, outputs)
 
+run_button = button.Button(10, 10, 50, 50, run, draw_run_button, is_static=True)
+train_button = button.Button(70, 10, 50, 50, train, draw_train_button, is_static=True)
 
-    test_Y = test_network(train_X, model)
-    print(test_Y)
+def updateMousePos(event):
+  global Mouse_x, Mouse_y
+  Mouse_x, Mouse_y = event.x, event.y
+
+def handleMouseMove(event):
+  updateMousePos(event)
+  
+def KeyRelease(event):
+  global network
+  if event.char == "d":
+      network.addNode(2)
+  elif event.char == "f":
+      network.removeNode(2)
+  elif event.char == "z":
+      network.addLayer(0)
+  elif event.char == "x":
+      network.removeLayer(0)
+  redraw(canvas)
+  
+
+def handleMouseDrag(event):
+  global root, canvas, network, Mouse_x, Mouse_y 
+  x, y = event.x, event.y
+  entity.Offset_x += x - Mouse_x
+  entity.Offset_y += y - Mouse_y
+  updateMousePos(event)
+  redraw(canvas)
+
+def handleMousePress(event):
+  global network, canvas
+
+  if run_button.inButton(event.x, event.y):
+    run_button.onClick()
+    return
+  if train_button.inButton(event.x, event.y):
+    train_button.onClick()
+    return
+  network.mouseClick(event.x, event.y)
+  redraw(canvas)
+
+def redraw(canvas):
+  canvas.delete('all')
+  network.drawNetwork(canvas)
+  run_button.draw(canvas)
+  train_button.draw(canvas)
+
+def main(width=800, height=600):
+  global root, canvas, network
+
+  ipc.new(1234)  
+
+  root = tkinter.Tk()
+  try:
+      root.attributes('-type', 'dialog')
+      print('Entering floating mode')
+  except:
+      pass
+
+  network = Network()
+  canvas = tkinter.Canvas(root, bg=BACKGROUND, height=height, width=width)
+  canvas.pack()
+  redraw(canvas)
+  root.bind('<B1-Motion>', handleMouseDrag)
+  root.bind('<Motion>', handleMouseMove)
+  root.bind('<Button-1>', handleMousePress)
+  root.bind('<KeyRelease>', KeyRelease)
+  #redrawAll(canvas)
+  root.mainloop()
+  
+main()
