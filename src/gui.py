@@ -9,6 +9,8 @@ root, canvas, prior_button_list, button_list  = None, None, None, None
 
 Mouse_x, Mouse_y = 0, 0
 
+nn = [1]
+
 
 
 def updateMousePos(event):
@@ -27,20 +29,23 @@ def handleMouseDrag(event):
   redrawAll(canvas, root)
 
 def handleMousePress(event):
-  global root, canvas
+  global prior_button_list
+  inButtonList = False
+  for btn in prior_button_list:
+      if btn.inButton(event.x, event.y):
+        inButtonList = True
+  if not inButtonList:
+    prior_button_list = []
+
   for btn in button_list:
     if btn.inButton(event.x, event.y):
       btn.onClick()
-  redrawAll(canvas, root)
 
-def KeyPressed(event):
-  pass
 
 def redrawAll(canvas, root):
   canvas.delete("all")
   for button in button_list:
     button.draw(canvas)
-
         
 def main(width=800, height=600):
   global root, canvas, prior_button_list, button_list 

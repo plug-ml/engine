@@ -38,13 +38,27 @@ class Layer(entity.Entity):
     
     def incNodesTechPos(self, width):
         x, y = self.getPos(width)
-        _, height = self.getOutline()
         return x + LAYER_BUFFER, y - TECH_BUTTON_DIM / 2
 
     def decNodesTechPos(self, width):
         x, y = self.getPos(width)
         _, height = self.getOutline()
         return x + LAYER_BUFFER, y + height - TECH_BUTTON_DIM / 2
+    
+    def incLayerLeftTechPos(self, width):
+        x, y = self.getPos(width)
+        _, height = self.getOutline()
+        return x - TECH_BUTTON_DIM / 2, y + height / 2 - TECH_BUTTON_DIM / 2
+
+    def incLayerRightTechPos(self, width):
+        x, y = self.getPos(width)
+        width, height = self.getOutline()
+        return x + width - TECH_BUTTON_DIM / 2, y + height / 2 - TECH_BUTTON_DIM / 2
+
+    def decLayerTechPos(self, width):
+        x, y = self.getPos(width)
+        width, height = self.getOutline()
+        return x + width / 2 - TECH_BUTTON_DIM / 2, y + height / 2 - TECH_BUTTON_DIM / 2
 
     # TODO: delete
     def inLayer(self, x, y, width):
@@ -95,18 +109,44 @@ class Network:
             canvas.create_line(decNodes_x, y + height, decNodes_x + TECH_BUTTON_DIM, y + height, fill = 'red')
             canvas.create_oval(decNodes_x, decNodes_y, decNodes_x + TECH_BUTTON_DIM, decNodes_y + TECH_BUTTON_DIM, outline = 'red')
 
+            incLayerLeft_x, incLayerLeft_y = layer.incLayerLeftTechPos(self.width())
+            incLayerRight_x, incLayerRight_y = layer.incLayerRightTechPos(self.width())
+            decLayer_x, decLayer_y = layer.decLayerTechPos(self.width())
+
+            canvas.create_line(incLayerLeft_x, y + height / 2, incLayerLeft_x + TECH_BUTTON_DIM, y + height / 2, fill = 'blue')
+            canvas.create_line(x, incLayerLeft_y, x, incLayerLeft_y + TECH_BUTTON_DIM, fill = 'blue')
+            canvas.create_oval(incLayerLeft_x, incLayerLeft_y, incLayerLeft_x + TECH_BUTTON_DIM, incLayerLeft_y + TECH_BUTTON_DIM, outline = 'blue')
+
+            canvas.create_line(incLayerRight_x, y + height / 2, incLayerRight_x + TECH_BUTTON_DIM, y + height / 2, fill = 'blue')
+            canvas.create_line(x + width, incLayerRight_y, x + width, incLayerRight_y + TECH_BUTTON_DIM, fill = 'blue')
+            canvas.create_oval(incLayerRight_x, incLayerRight_y, incLayerRight_x + TECH_BUTTON_DIM, incLayerRight_y + TECH_BUTTON_DIM, outline = 'blue')
+
+            canvas.create_line(decLayer_x, y + height / 2, decLayer_x + TECH_BUTTON_DIM, y + height / 2, fill = 'red')
+            canvas.create_oval(decLayer_x, decLayer_y, decLayer_x + TECH_BUTTON_DIM, decLayer_y + TECH_BUTTON_DIM, outline = 'red')
+
     def mouseClick(self, x, y):
         if self.highlighted >= len(self.layer_list):
             self.hightlighted = -1
         if self.highlighted != -1:
             layer = self.layer_list[self.highlighted]
-            incNodes_x, incNodes_y = layer.incNodesTechPos(self.width())
-            decNodes_x, decNodes_y = layer.decNodesTechPos(self.width())
-            if incNodes_x <= x <= incNodes_x + TECH_BUTTON_DIM and incNodes_y <= y <= incNodes_y + TECH_BUTTON_DIM:
+
+            def inTechBounds(button_x, button_y):
+                return button_x <= x <= button_x + TECH_BUTTON_DIM and button_y <= y <= button_y + TECH_BUTTON_DIM
+
+            if inTechBounds(*layer.incNodesTechPos(self.width())):
                 layer.incNode()
                 return
-            if decNodes_x <= x <= decNodes_x + TECH_BUTTON_DIM and decNodes_y <= y <= decNodes_y + TECH_BUTTON_DIM:
+            if inTechBounds(*layer.decNodesTechPos(self.width())):
                 layer.decNode()
+                return
+            if inTechBounds(*layer.incLayerLeftTechPos(self.width())):
+                self.addLayer(self.highlighted)
+                return
+            if inTechBounds(*layer.incLayerRightTechPos(self.width())):
+                self.addLayer(self.highlighted + 1)
+                return
+            if inTechBounds(*layer.decLayerTechPos(self.width())):
+                self.removeLayer(self.highlighted)
                 return
         for i in range(len(self.layer_list)):
             layer = self.layer_list[i]
